@@ -94,7 +94,7 @@ class WoodPickaxe {
         this.minPower = 5;
         this.maxPower = 5; 
         this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
-        this.color = rgb(107, 81, 50);
+        this.color = "#8B4513";
     }
 }
 class CopperPickaxe {
