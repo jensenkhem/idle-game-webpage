@@ -28,15 +28,15 @@
 #cmdline {
     position: absolute;
     top: 90%;
-    left: 39%;
-    font-size: 30px;
+    left: 77%;
+    font-size: 25px;
     font-weight: bold;
 }
 
 #inventory {
     position: absolute;
-    top: 70%;
-    left: 80%;
+    top: 65%;
+    left: 82%;
     font-size: 30px;
     font-weight: bold;
 }
@@ -65,13 +65,13 @@
 
 #copper {
     position: fixed;
-    left: 10%;
+    left: 8%;
     top: 10%;
 }
 
 #iron {
     position: fixed;
-    left: 23%;
+    left: 20%;
     top: 9%;
 }
   

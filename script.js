@@ -1,15 +1,29 @@
 window.onload = function() {
     // Main function -> Sets up all variables at the start and begins the game loop!
-    player = new Player();
     game = new Game();
+    player = loadGame()
+    if(player == null) {
+        player = new Player();
+    }
     game.copperPic.addEventListener("click", function() {switchOre(player, game, "copper")});
     game.ironPic.addEventListener("click", function() {switchOre(player, game, "iron")});
+
+    //Update screen elements!
+    game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax; move(player, game);
+    game.levelDisplay.innerHTML = "Level: " + player.level; 
+    game.pickName.innerHTML = player.pickaxe.name + " <span id='pickPower'> " + "- Power: " + player.pickaxe.power;
+    game.pickName.style.color = player.pickaxe.color;
+    game.copperCount.innerHTML = "Copper: " + player.copper;
+    game.ironCount.innerHTML = "Iron: " + player.iron;
+
+    // Setup the chat box entry key event
     window.addEventListener('keydown', (event) => {
         if(event.keyCode === 13) {
             this.readLine(player, game)
         }
     });
-    this.setInterval(function() {mine(player, game);}, game.tickRate)
+
+    this.setInterval(function() {mine(player, game); saveGame(player);}, game.tickRate)
 };
 
 class Player {
@@ -43,6 +57,13 @@ class Game {
         this.pickName = document.getElementById("pickName");
         this.pickPower = document.getElementById("pickPower");
         this.commandLine = document.getElementById("cmdline")
+
+        // Log table data
+        this.row1 = document.getElementById("row1");
+        this.row2 = document.getElementById("row2");
+        this.row3 = document.getElementById("row3");
+        this.row4 = document.getElementById("row4");
+        this.row5 = document.getElementById("row5");
     }
 }
 
@@ -73,6 +94,7 @@ class WoodPickaxe {
         this.minPower = 5;
         this.maxPower = 5; 
         this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
+        this.color = rgb(107, 81, 50);
     }
 }
 class CopperPickaxe {
@@ -83,6 +105,7 @@ class CopperPickaxe {
         this.maxPower = 10; 
         this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
         this.cost = 50;
+        this.color = "#e67300";
     }
 }
 
@@ -151,8 +174,7 @@ function swapItem(game, player, item) {
     player.pickaxe = item;
     if(item.name == "Copper Pickaxe") {
         game.pickName.innerHTML = "Copper Pickaxe <span id='pickPower'> " + "- Power: " + item.power;
-        game.pickName.style.color = "#e67300";
-        //game.pickPower.innerHTML = " - Power: " + item.power;
+        game.pickName.style.color = item.color;
     }
 }
 
@@ -244,13 +266,6 @@ function updateLog(game, message) {
     // Biggest QOL issue is this log 
     // -> Will need a major rework where the newest item appears in bold at the bottom and older entries bubble up
     // Updates the game activity log! -> Keeps track of all player actions
-    current_row = "row" + game.logRow;
-    if(game.logRow != 1) {
-        prev_row = "row" + (game.logRow - 1);
-    }
-    else {
-        prev_row = "row5"
-    }
     // Get the current date and format the fields nicely!
     d = new Date()
     h = d.getHours()
@@ -265,12 +280,35 @@ function updateLog(game, message) {
     if(s < 10) {
         s = "0" + s;
     }
-    // Update the game display elements!
-    document.getElementById(current_row).innerHTML = message + " " + h + ":" + m + ":" + s;
-    document.getElementById(current_row).style.fontWeight = "bold";
-    document.getElementById(prev_row).style.fontWeight = "normal";
-    game.logRow++;
-    if(game.logRow == 6) {
-        game.logRow = 1;
-    } 
+
+    if(document.getElementById("row5").innerHTML == "") {
+        current_row = "row" + game.logRow;
+        if(game.logRow != 1) {
+            prev_row = "row" + (game.logRow - 1);
+        }
+        else {
+            prev_row = "row5"
+        }
+        game.logRow++;
+        // Update the game display elements!
+        document.getElementById(current_row).innerHTML = message + " " + h + ":" + m + ":" + s;
+        document.getElementById(current_row).style.fontWeight = "bold";
+        document.getElementById(prev_row).style.fontWeight = "normal";
+    }
+    else {
+        game.row1.innerHTML = game.row2.innerHTML;
+        game.row2.innerHTML = game.row3.innerHTML;
+        game.row3.innerHTML = game.row4.innerHTML;
+        game.row4.innerHTML = game.row5.innerHTML;
+        game.row5.innerHTML = message + " " + h + ":" + m + ":" + s;
+        game.row5.style.fontWeight = "bold";
+    }
+}
+
+function saveGame(player) {
+    localStorage.setItem('player', JSON.stringify(player));
+}
+
+function loadGame() {
+    return JSON.parse(localStorage.getItem('player'));
 }
