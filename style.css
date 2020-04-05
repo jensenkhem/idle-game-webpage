@@ -1,0 +1,109 @@
+#exp {
+    color: rgb(0, 0, 0);
+    font-size: 30px;
+    font-weight: bold;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+#level {
+    color: rgb(0, 0, 0);
+    font-size: 30px;
+    font-weight: bold;
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+#myTable {
+    position: absolute;
+    top: 80%;
+    left: 3%;
+    font-size: 20px;
+}
+
+#cmdline {
+    position: absolute;
+    top: 90%;
+    left: 39%;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+#inventory {
+    position: absolute;
+    top: 70%;
+    left: 80%;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+#items {
+    font-size: 20px;
+    position: relative;
+    left: -30%;
+    margin-top: 10%;
+}
+
+#myProgress {
+    width: 15%;
+    vertical-align: middle;
+    background-color: rgb(136, 133, 133);
+    position: fixed;
+    top: 45%;
+    left: 50%; 
+    transform: translate(-50%, -50%) 
+}
+
+#progressText {
+    position: fixed;
+    left: 45%;
+}
+
+#copper {
+    position: fixed;
+    left: 10%;
+    top: 10%;
+}
+
+#iron {
+    position: fixed;
+    left: 23%;
+    top: 9%;
+}
+  
+#myBar {
+    width: 0%;
+    height: 30px;
+    background-color: rgb(0, 0, 0);
+    text-align: center;
+    line-height: 30px;
+    color: rgb(255, 255, 255);
+    font-style: italic;
+    position: relative;
+}
+
+#pickInfo {
+    font-size: 20px;
+    font-weight: bold;
+    position: fixed;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%) 
+}
+
+#pickName {
+    color: rgb(107, 81, 50);
+    transform: translate(-50%, -50%) 
+}
+
+#pickPower {
+    color:  rgb(0, 0, 0);
+}
+
+body {
+    background-color: aliceblue;
+}
