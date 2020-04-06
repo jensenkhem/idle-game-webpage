@@ -31,7 +31,7 @@ class Player {
     constructor() {
         this.progress = 0;
         this.exp = 0;
-        this.expMax = 12;
+        this.expMax = 4;
         this.level = 1;
         // Player items/states
         this.currentOre = null;
