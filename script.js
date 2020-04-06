@@ -34,6 +34,10 @@ class Player {
         this.pickaxe = new WoodPickaxe();
         this.copper = 0;
         this.iron = 0;
+        // For the lifetime stats page!
+        this.creationDate = new Date();
+        this.totalCopper = 0;
+        this.totalIron = 0;
     }
 }
 
@@ -145,12 +149,14 @@ function incrementItems(player, game) {
     // Add the correct items to the player's inventory after successful mine!
     if(player.currentOre.name == "copper") {
         player.copper++;
+        player.totalCopper++;
         console.log("Player copper: " + player.copper);
         //Update the game display!
         game.copperCount.innerHTML = "Copper: " + player.copper;
     }
     if(player.currentOre.name == "iron") {
         player.iron++;
+        player.totalIron++;
         console.log("Player iron: " + player.copper);
         //Update the game display!
         game.ironCount.innerHTML = "Iron: " + player.iron;
@@ -277,6 +283,10 @@ function levelUp(player, game) {
     }
 }
 
+function viewStats(player) {
+    alert("Player stats:\nDate started: " + player.creationDate + "\nTotal copper mined: " + player.totalCopper + "\ntotal iron mined: " + player.totalIron);
+}
+
 function move(player, game) {
     // Moves the player's exp progress bar!
     player.progress = Math.floor((player.exp / player.expMax) * 100);
@@ -309,6 +319,9 @@ function readLine(player, game) {
     }
     if(line == "reset") {
         reset(player);
+    }
+    if(line == "stats") {
+        viewStats(player);
     }
 }
 
