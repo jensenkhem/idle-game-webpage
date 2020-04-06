@@ -22,7 +22,7 @@ window.onload = function() {
             this.readLine(player, game)
         }
     });
-
+    // Start the game loop!
     this.setInterval(function() {mine(player, game); saveGame(player);}, game.tickRate)
 };
 
@@ -71,7 +71,7 @@ class Copper {
     // Describes the stats for copper ore!
     constructor() {
         this.name = "copper";
-        this.power = 25;
+        this.power = 50;
         this.exp = 1;
     }
 
@@ -81,7 +81,7 @@ class Iron {
     // Describes the stats for iron ore!
     constructor() {
         this.name = "iron";
-        this.power = 500;
+        this.power = 150;
         this.exp = 4;
     }
 
@@ -109,6 +109,18 @@ class CopperPickaxe {
     }
 }
 
+class IronPickaxe {
+    // Describes the equippable items!
+    constructor() {
+        this.name = "Iron Pickaxe";
+        this.minPower = 15;
+        this.maxPower = 30; 
+        this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
+        this.cost = 75;
+        this.color = "#808080";
+    }
+}
+
 class Drops {
     // Describes (possibly?) all of the possible drops from ore!
     constructor() {
@@ -124,8 +136,13 @@ function switchOre(player, game, ore) {
         player.currentOre = new Copper();
     }
     if(ore == "iron") {
-        updateLog(game, "You are now mining iron!");
-        player.currentOre = new Iron();
+        if(player.level >= 10) {
+            updateLog(game, "You are now mining iron!");
+            player.currentOre = new Iron();
+        }
+        else {
+            updateLog(game, "You are not skilled enough to mine this yet!");
+        }
     }
 }
 
@@ -165,17 +182,31 @@ function craftItem(player, game, item) {
             updateLog(game, "Not enough resources!");
         }
     }
-    // Add more items here later..
+    if(item.name == "Iron Pickaxe") {
+        if(player.iron >= item.cost && item.maxPower >= player.pickaxe.maxPower) {
+            // Do not allow the player to accidentely make a big downgrade!
+            chance = Math.random();
+            player.iron -= item.cost;
+            if(chance >= 0.50) {
+                // Successfully crafted!
+                swapItem(game, player, item);
+            }
+            else {
+                updateLog(game, "Crafting failed! Maybe next time...");
+            }
+        }
+        else {
+            updateLog(game, "Not enough resources!");
+        }
+    }
 }
 
 function swapItem(game, player, item) {
     // Set the player's current pickaxe to the one they just crafted and updates display accordingly
     updateLog(game, "Successfully crafted: " + item.name + " (+" + (item.power - player.pickaxe.power) + " power!)");
     player.pickaxe = item;
-    if(item.name == "Copper Pickaxe") {
-        game.pickName.innerHTML = "Copper Pickaxe <span id='pickPower'> " + "- Power: " + item.power;
-        game.pickName.style.color = item.color;
-    }
+    game.pickName.innerHTML =  item.name + " <span id='pickPower'> " + "- Power: " + item.power;
+    game.pickName.style.color = item.color;
 }
 
 function mine(player, game) {
@@ -260,6 +291,13 @@ function readLine(player, game) {
         item = new CopperPickaxe();
         craftItem(player, game, item);
     }
+    if(line == "craft ipick") {
+        item = new IronPickaxe();
+        craftItem(player, game, item);
+    }
+    if(line == "reset") {
+        reset(player);
+    }
 }
 
 function updateLog(game, message) {
@@ -311,4 +349,23 @@ function saveGame(player) {
 
 function loadGame() {
     return JSON.parse(localStorage.getItem('player'));
+}
+
+function reset(player) {
+    console.log("Got here!")
+    player.progress = 0;
+    player.exp = 0;
+    player.expMax = 12;
+    player.level = 1;
+    // Player items/states
+    player.currentOre = null;
+    player.pickaxe = new WoodPickaxe();
+    player.copper = 0;
+    player.iron = 0;
+    game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax; move(player, game);
+    game.levelDisplay.innerHTML = "Level: " + player.level; 
+    game.pickName.innerHTML = player.pickaxe.name + " <span id='pickPower'> " + "- Power: " + player.pickaxe.power;
+    game.pickName.style.color = player.pickaxe.color;
+    game.copperCount.innerHTML = "Copper: " + player.copper;
+    game.ironCount.innerHTML = "Iron: " + player.iron;
 }
