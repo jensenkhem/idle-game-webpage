@@ -9,12 +9,7 @@ window.onload = function() {
     game.ironPic.addEventListener("click", function() {switchOre(player, game, "iron")});
 
     //Update screen elements!
-    game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax; move(player, game);
-    game.levelDisplay.innerHTML = "Level: " + player.level; 
-    game.pickName.innerHTML = player.pickaxe.name + " <span id='pickPower'> " + "- Power: " + player.pickaxe.power;
-    game.pickName.style.color = player.pickaxe.color;
-    game.copperCount.innerHTML = "Copper: " + player.copper;
-    game.ironCount.innerHTML = "Iron: " + player.iron;
+    updateDisplay(game, player);
 
     // Setup the chat box entry key event
     window.addEventListener('keydown', (event) => {
@@ -23,16 +18,17 @@ window.onload = function() {
         }
     });
     // Start the game loop!
-    this.setInterval(function() {mine(player, game); saveGame(player);}, game.tickRate)
+    this.setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate)
 };
 
 class Player {
     // Describes all of the stats of the player!
     constructor() {
+        this.tickRate = 3000;
         this.progress = 0;
         this.exp = 0;
         this.expMax = 4;
-        this.level = 1;
+        this.level = 9;
         // Player items/states
         this.currentOre = null;
         this.pickaxe = new WoodPickaxe();
@@ -45,7 +41,6 @@ class Game {
     // Describes all of the game objects such as display etc.
     constructor() {
         this.logRow = 1;
-        this.tickRate = 3000;
         this.progressBar = document.getElementById("myBar");
         this.progressPercent = document.getElementById("progressText");
         this.levelDisplay = document.getElementById("level");
@@ -162,6 +157,7 @@ function incrementItems(player, game) {
     }
 }
 
+
 function craftItem(player, game, item) {
     // Allow the user to craft pickaxes!
     console.log(item.name)
@@ -177,6 +173,7 @@ function craftItem(player, game, item) {
             else {
                 updateLog(game, "Crafting failed! Maybe next time...");
             }
+            updateDisplay(game, player);
         }
         else {
             updateLog(game, "Not enough resources!");
@@ -273,6 +270,11 @@ function levelUp(player, game) {
     player.level += 1;
     player.exp -= player.expMax;
     player.expMax = Math.floor(player.expMax * 1.27);
+    if(player.level % 10 == 0) {
+        player.tickRate *= 0.9;
+        updateLog(game, "You feel quicker than before! Mining speed up!");
+        console.log(player.tickRate);
+    }
 }
 
 function move(player, game) {
@@ -280,6 +282,16 @@ function move(player, game) {
     player.progress = Math.floor((player.exp / player.expMax) * 100);
     game.progressBar.style.width = player.progress + "%";
     game.progressPercent.innerHTML = player.progress + "%";
+}
+
+function updateDisplay(game, player) {
+    // Updates the game's display elements to the correct values stored in memory!
+    game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax; move(player, game);
+    game.levelDisplay.innerHTML = "Level: " + player.level; 
+    game.pickName.innerHTML = player.pickaxe.name + " <span id='pickPower'> " + "- Power: " + player.pickaxe.power;
+    game.pickName.style.color = player.pickaxe.color;
+    game.copperCount.innerHTML = "Copper: " + player.copper;
+    game.ironCount.innerHTML = "Iron: " + player.iron;
 }
 
 function readLine(player, game) {
@@ -301,8 +313,6 @@ function readLine(player, game) {
 }
 
 function updateLog(game, message) {
-    // Biggest QOL issue is this log 
-    // -> Will need a major rework where the newest item appears in bold at the bottom and older entries bubble up
     // Updates the game activity log! -> Keeps track of all player actions
     // Get the current date and format the fields nicely!
     d = new Date()
@@ -352,10 +362,10 @@ function loadGame() {
 }
 
 function reset(player) {
-    console.log("Got here!")
+    player.tickRate = 3000;
     player.progress = 0;
     player.exp = 0;
-    player.expMax = 12;
+    player.expMax = 4;
     player.level = 1;
     // Player items/states
     player.currentOre = null;
