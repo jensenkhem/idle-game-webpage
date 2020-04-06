@@ -28,16 +28,18 @@ class Player {
         this.progress = 0;
         this.exp = 0;
         this.expMax = 4;
-        this.level = 9;
+        this.level = 1;
         // Player items/states
         this.currentOre = null;
         this.pickaxe = new WoodPickaxe();
         this.copper = 0;
         this.iron = 0;
+        this.steel = 0;
         // For the lifetime stats page!
         this.creationDate = new Date();
         this.totalCopper = 0;
         this.totalIron = 0;
+        this.totalSteel = 0;
     }
 }
 
@@ -53,6 +55,7 @@ class Game {
         this.copperCount = document.getElementById("inv1");
         this.ironPic = document.getElementById("iron");
         this.ironCount = document.getElementById("inv2");
+        this.steelCount = document.getElementById("inv3");
         this.pickName = document.getElementById("pickName");
         this.pickPower = document.getElementById("pickPower");
         this.commandLine = document.getElementById("cmdline")
@@ -83,7 +86,14 @@ class Iron {
         this.power = 150;
         this.exp = 4;
     }
+}
 
+class Steel {
+    constructor() {
+        this.name = "steel";
+        this.ironComp = 5;
+        this.copperComp = 25;
+    }
 }
 
 class WoodPickaxe {
@@ -117,6 +127,17 @@ class IronPickaxe {
         this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
         this.cost = 75;
         this.color = "#808080";
+    }
+}
+
+class SteelPickaxe {
+    constructor() {
+        this.name = "Steel Pickaxe";
+        this.minPower = 50;
+        this.maxPower = 100; 
+        this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
+        this.cost = 100;
+        this.color = "#3e3e3e";
     }
 }
 
@@ -179,7 +200,6 @@ function craftItem(player, game, item) {
             else {
                 updateLog(game, "Crafting failed! Maybe next time...");
             }
-            updateDisplay(game, player);
         }
         else {
             updateLog(game, "Not enough resources!");
@@ -202,6 +222,24 @@ function craftItem(player, game, item) {
             updateLog(game, "Not enough resources!");
         }
     }
+    if(item.name == "Steel Pickaxe") {
+        if(player.steel >= item.cost && item.maxPower >= player.pickaxe.maxPower) {
+            // Do not allow the player to accidentely make a big downgrade!
+            chance = Math.random();
+            player.steel -= item.cost;
+            if(chance >= 0.50) {
+                // Successfully crafted!
+                swapItem(game, player, item);
+            }
+            else {
+                updateLog(game, "Crafting failed! Maybe next time...");
+            }
+        }
+        else {
+            updateLog(game, "Not enough resources!");
+        }
+    }
+    updateDisplay(game, player);
 }
 
 function swapItem(game, player, item) {
@@ -284,7 +322,7 @@ function levelUp(player, game) {
 }
 
 function viewStats(player) {
-    alert("Player stats:\nDate started: " + player.creationDate + "\nTotal copper mined: " + player.totalCopper + "\ntotal iron mined: " + player.totalIron);
+    alert("Player stats:\nDate started: " + player.creationDate + "\nTotal copper mined: " + player.totalCopper + "\ntotal iron mined: " + player.totalIron + "\ntotal steel crafted: " + player.totalSteel);
 }
 
 function move(player, game) {
@@ -302,26 +340,73 @@ function updateDisplay(game, player) {
     game.pickName.style.color = player.pickaxe.color;
     game.copperCount.innerHTML = "Copper: " + player.copper;
     game.ironCount.innerHTML = "Iron: " + player.iron;
+    game.steelCount.innerHTML = "Steel: " + player.steel;
 }
 
 function readLine(player, game) {
     // Reads a line from the command line interface and handles it!
     line = game.commandLine.value;
-    console.log(line);
+    splitLine = line.split(" ");
     game.commandLine.value = '';
-    if(line == "craft cpick") {
-        item = new CopperPickaxe();
-        craftItem(player, game, item);
+    if(splitLine.length <= 2) {
+        if(line == "craft cpick") {
+            item = new CopperPickaxe();
+            craftItem(player, game, item);
+        }
+        if(line == "craft ipick") {
+            item = new IronPickaxe();
+            craftItem(player, game, item);
+        }
+        if(line == "craft spick"){
+            item = new SteelPickaxe();
+            craftItem(player, game, item);
+        }
+        if(line == "reset") {
+            reset(player);
+        }
+        if(line == "stats") {
+            viewStats(player);
+        }
+        if(line == "craft steel"){
+            exchange(player, game, new Steel(), 1);
+        }
     }
-    if(line == "craft ipick") {
-        item = new IronPickaxe();
-        craftItem(player, game, item);
+    if(splitLine.length == 3) {
+        if(splitLine[0] + " " + splitLine[1] == "craft steel") {
+            try {
+                num = parseInt(splitLine[2]);
+                if(num <= 0) {
+                    updateLog(game, "Invalid argument(s) given!");
+                }
+                else {
+                    exchange(player, game, new Steel(), num);
+                }
+            }
+            catch(err) {
+                updateLog(game, "Invalid argument(s) given!");
+            }
+        }
     }
-    if(line == "reset") {
-        reset(player);
-    }
-    if(line == "stats") {
-        viewStats(player);
+
+}
+
+function exchange(player, game, target, num) {
+    if(player.copper >= target.copperComp * num && player.iron >= target.ironComp * num) { // Add more conditions later for all ores! 
+        player.copper -= target.copperComp * num;
+        player.iron -= target.ironComp * num;
+        switch(true) {
+            case target.name == "steel":
+                player.steel+=num;
+                player.totalSteel+=num;
+                break;
+            default:
+                alert("Shouldnt get here!");
+        }
+        updateLog(game, "You have crafted " + target.name + "! (" + num + ")");
+        updateDisplay(game, player);
+    } 
+    else {
+        updateLog("Not enough resources!")
     }
 }
 
@@ -385,10 +470,10 @@ function reset(player) {
     player.pickaxe = new WoodPickaxe();
     player.copper = 0;
     player.iron = 0;
-    game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax; move(player, game);
-    game.levelDisplay.innerHTML = "Level: " + player.level; 
-    game.pickName.innerHTML = player.pickaxe.name + " <span id='pickPower'> " + "- Power: " + player.pickaxe.power;
-    game.pickName.style.color = player.pickaxe.color;
-    game.copperCount.innerHTML = "Copper: " + player.copper;
-    game.ironCount.innerHTML = "Iron: " + player.iron;
+    player.steel = 0;
+    player.creationDate = new Date();
+    this.totalCopper = 0;
+    this.totalIron = 0;
+    this.totalSteel = 0;
+    updateDisplay(game, player);
 }
