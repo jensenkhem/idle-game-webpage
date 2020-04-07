@@ -10,6 +10,7 @@
 #   cpick: (Copper pickaxe, costs 50 copper to attempt to craft - Power range 6 -> 10)
 #   ipick: (Iron pickaxe, costs 75 iron to attempt to craft - Power range 15 -> 30)
 #   spick: (Steel pickaxe, costs 50 steel to attempt to craft - Power range 50 -> 100)
+#   mpick: (Mithril Pickaxe, costs 50 mithril to attempt to craft - Power range 125 -> 200) 
 # 
 # Items:
 #   steel: Costs 5 iron and 8 copper to make!
