@@ -91,8 +91,8 @@ class Iron {
 class Steel {
     constructor() {
         this.name = "steel";
-        this.ironComp = 5;
-        this.copperComp = 25;
+        this.ironComp = 10;
+        this.copperComp = 20;
     }
 }
 
@@ -136,7 +136,7 @@ class SteelPickaxe {
         this.minPower = 50;
         this.maxPower = 100; 
         this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
-        this.cost = 100;
+        this.cost = 50;
         this.color = "#3e3e3e";
     }
 }
@@ -460,6 +460,7 @@ function loadGame() {
 }
 
 function reset(player) {
+    
     player.tickRate = 3000;
     player.progress = 0;
     player.exp = 0;
