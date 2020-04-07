@@ -7,7 +7,7 @@ window.onload = function() {
     }
     game.copperPic.addEventListener("click", function() {switchOre(player, game, "copper")});
     game.ironPic.addEventListener("click", function() {switchOre(player, game, "iron")});
-
+    game.mithrilPic.addEventListener("click", function() {switchOre(player, game, "mithril")});
     //Update screen elements!
     updateDisplay(game, player);
 
@@ -35,11 +35,13 @@ class Player {
         this.copper = 0;
         this.iron = 0;
         this.steel = 0;
+        this.mithril = 0;
         // For the lifetime stats page!
         this.creationDate = new Date();
         this.totalCopper = 0;
         this.totalIron = 0;
         this.totalSteel = 0;
+        this.totalMithril = 0;
     }
 }
 
@@ -56,9 +58,11 @@ class Game {
         this.ironPic = document.getElementById("iron");
         this.ironCount = document.getElementById("inv2");
         this.steelCount = document.getElementById("inv3");
+        this.mithrilPic = document.getElementById("mithril");
+        this.mithrilCount = document.getElementById("inv4");
         this.pickName = document.getElementById("pickName");
         this.pickPower = document.getElementById("pickPower");
-        this.commandLine = document.getElementById("cmdline")
+        this.commandLine = document.getElementById("cmdline");
 
         // Log table data
         this.row1 = document.getElementById("row1");
@@ -93,6 +97,14 @@ class Steel {
         this.name = "steel";
         this.ironComp = 10;
         this.copperComp = 20;
+    }
+}
+
+class Mithril {
+    constructor() {
+        this.name = "mithril";
+        this.power = 500;
+        this.exp = 22;
     }
 }
 
@@ -141,6 +153,18 @@ class SteelPickaxe {
     }
 }
 
+class MithrilPickaxe {
+    constructor() {
+        this.name = "Mithril Pickaxe";
+        this.minPower = 125;
+        this.maxPower = 200; 
+        this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
+        this.cost = 50;
+        this.color = "#9370DB";
+    }
+}
+
+
 class Drops {
     // Describes (possibly?) all of the possible drops from ore!
     constructor() {
@@ -164,6 +188,15 @@ function switchOre(player, game, ore) {
             updateLog(game, "You are not skilled enough to mine this yet!");
         }
     }
+    if(ore == "mithril") {
+        if(player.level >= 25) {
+            updateLog(game, "You are now mining mithril!");
+            player.currentOre = new Mithril();
+        }
+        else {
+            updateLog(game, "You are not skilled enough to mine this yet!");
+        }
+    }
 }
 
 function incrementItems(player, game) {
@@ -181,6 +214,13 @@ function incrementItems(player, game) {
         console.log("Player iron: " + player.copper);
         //Update the game display!
         game.ironCount.innerHTML = "Iron: " + player.iron;
+    }
+    if(player.currentOre.name == "mithril") {
+        player.mithril++;
+        player.totalMithril++;
+        console.log("Player Mithril: " + player.mithril);
+        //Update the game display!
+        game.mithrilCount.innerHTML = "Mithril: " + player.mithril;
     }
 }
 
@@ -227,6 +267,23 @@ function craftItem(player, game, item) {
             // Do not allow the player to accidentely make a big downgrade!
             chance = Math.random();
             player.steel -= item.cost;
+            if(chance >= 0.50) {
+                // Successfully crafted!
+                swapItem(game, player, item);
+            }
+            else {
+                updateLog(game, "Crafting failed! Maybe next time...");
+            }
+        }
+        else {
+            updateLog(game, "Not enough resources!");
+        }
+    }
+    if(item.name == "Mithril Pickaxe") {
+        if(player.mithril >= item.cost && item.maxPower >= player.pickaxe.maxPower) {
+            // Do not allow the player to accidentely make a big downgrade!
+            chance = Math.random();
+            player.mithril -= item.cost;
             if(chance >= 0.50) {
                 // Successfully crafted!
                 swapItem(game, player, item);
@@ -341,6 +398,7 @@ function updateDisplay(game, player) {
     game.copperCount.innerHTML = "Copper: " + player.copper;
     game.ironCount.innerHTML = "Iron: " + player.iron;
     game.steelCount.innerHTML = "Steel: " + player.steel;
+    game.mithrilCount.innerHTML = "Mithril: " + player.mithril;
 }
 
 function readLine(player, game) {
@@ -359,6 +417,10 @@ function readLine(player, game) {
         }
         if(line == "craft spick"){
             item = new SteelPickaxe();
+            craftItem(player, game, item);
+        }
+        if(line == "craft mpick"){
+            item = new MithrilPickaxe();
             craftItem(player, game, item);
         }
         if(line == "reset") {
@@ -472,9 +534,11 @@ function reset(player) {
     player.copper = 0;
     player.iron = 0;
     player.steel = 0;
+    player.mithril = 0;
     player.creationDate = new Date();
-    this.totalCopper = 0;
-    this.totalIron = 0;
-    this.totalSteel = 0;
+    player.totalCopper = 0;
+    player.totalIron = 0;
+    player.totalSteel = 0;
+    player.totalMithril = 0;
     updateDisplay(game, player);
 }

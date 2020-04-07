@@ -71,8 +71,14 @@
 
 #iron {
     position: fixed;
-    left: 20%;
+    left: 19%;
     top: 9%;
+}
+
+#mithril {
+    position: fixed;
+    left: 31%;
+    top: 8%;
 }
   
 #myBar {
