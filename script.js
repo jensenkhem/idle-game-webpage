@@ -1,3 +1,4 @@
+myInterval = null;
 window.onload = function() {
     // Main function -> Sets up all variables at the start and begins the game loop!
     game = new Game();
@@ -18,7 +19,7 @@ window.onload = function() {
         }
     });
     // Start the game loop!
-    this.setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate)
+    myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate)
 };
 
 class Player {
@@ -375,6 +376,9 @@ function levelUp(player, game) {
         player.tickRate *= 0.9;
         updateLog(game, "You feel quicker than before! Mining speed up!");
         console.log(player.tickRate);
+        // Clear the game interval and reset with the new tickrate!
+        clearInterval(myInterval);
+        myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate);
     }
 }
 
@@ -424,7 +428,10 @@ function readLine(player, game) {
             craftItem(player, game, item);
         }
         if(line == "reset") {
-            reset(player);
+            check = confirm("This will reset the game COMPLETELY -> Are you sure?");
+            if(check == 1) {
+                reset(player);
+            }
         }
         if(line == "stats") {
             viewStats(player);
@@ -521,8 +528,7 @@ function loadGame() {
     return JSON.parse(localStorage.getItem('player'));
 }
 
-function reset(player) {
-    
+function reset(player) {  
     player.tickRate = 3000;
     player.progress = 0;
     player.exp = 0;
