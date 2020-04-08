@@ -64,6 +64,7 @@ class Game {
         this.mithrilCount = document.getElementById("inv4");
         this.pickName = document.getElementById("pickName");
         this.pickPower = document.getElementById("pickPower");
+        this.shardCount = document.getElementById("magic");
         this.commandLine = document.getElementById("cmdline");
 
         // Log table data
