@@ -37,6 +37,7 @@ class Player {
         this.iron = 0;
         this.steel = 0;
         this.mithril = 0;
+        this.shards = 0;
         // For the lifetime stats page!
         this.creationDate = new Date();
         this.totalCopper = 0;
@@ -160,7 +161,7 @@ class MithrilPickaxe {
         this.minPower = 125;
         this.maxPower = 200; 
         this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
-        this.cost = 50;
+        this.cost = 250;
         this.color = "#9370DB";
     }
 }
@@ -190,7 +191,7 @@ function switchOre(player, game, ore) {
         }
     }
     if(ore == "mithril") {
-        if(player.level >= 25) {
+        if(player.level >= 30) {
             updateLog(game, "You are now mining mithril!");
             player.currentOre = new Mithril();
         }
@@ -325,6 +326,10 @@ function mine(player, game) {
             console.log(roll.toFixed(5))
             if(roll >= threshold) {
                 // Item gain
+                if(roll >= 0.995) {
+                    updateLog(game, "A seemingly magical shard emerges from the ore..");
+                    player.shards++;
+                }
                 incrementItems(player, game);
                 // Level up stuff
                 updateLog(game, "You mined " + player.currentOre.name + "! (+" + player.currentOre.exp + " exp)");
@@ -403,6 +408,7 @@ function updateDisplay(game, player) {
     game.ironCount.innerHTML = "Iron: " + player.iron;
     game.steelCount.innerHTML = "Steel: " + player.steel;
     game.mithrilCount.innerHTML = "Mithril: " + player.mithril;
+    game.shardCount.innerHTML = "Magic shards: " + player.shards;
 }
 
 function readLine(player, game) {
@@ -444,15 +450,16 @@ function readLine(player, game) {
         if(splitLine[0] + " " + splitLine[1] == "craft steel") {
             try {
                 num = parseInt(splitLine[2]);
-                if(num <= 0) {
-                    updateLog(game, "Invalid argument(s) given!");
-                }
-                else {
-                    exchange(player, game, new Steel(), num);
-                }
             }
             catch(err) {
                 updateLog(game, "Invalid argument(s) given!");
+                return;
+            }
+            if(num <= 0) {
+                updateLog(game, "Invalid argument(s) given!");
+            }
+            else {
+                exchange(player, game, new Steel(), num);
             }
         }
     }
@@ -460,6 +467,7 @@ function readLine(player, game) {
 }
 
 function exchange(player, game, target, num) {
+    // Exchange certain ores for other ores!
     if(player.copper >= target.copperComp * num && player.iron >= target.ironComp * num) { // Add more conditions later for all ores! 
         player.copper -= target.copperComp * num;
         player.iron -= target.ironComp * num;
@@ -521,10 +529,12 @@ function updateLog(game, message) {
 }
 
 function saveGame(player) {
+    // Saves the player state into local storage
     localStorage.setItem('player', JSON.stringify(player));
 }
 
 function loadGame() {
+    // Loads the player state from local storage
     return JSON.parse(localStorage.getItem('player'));
 }
 

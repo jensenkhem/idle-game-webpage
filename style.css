@@ -35,7 +35,7 @@
 
 #inventory {
     position: absolute;
-    top: 65%;
+    top: 55%;
     left: 82%;
     font-size: 30px;
     font-weight: bold;
@@ -46,6 +46,11 @@
     position: relative;
     left: -30%;
     margin-top: 10%;
+}
+
+#magic {
+    position: relative;
+    left: 30%;
 }
 
 #myProgress {
