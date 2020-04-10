@@ -193,7 +193,7 @@ function switchOre(player, game, ore) {
     }
     if(ore == "mithril") {
         if(player.level >= 30) {
-            updateLog(game, "You are now mining mithril!");
+            updateLog(game, "You are now mining mithril!", 0);
             player.currentOre = new Mithril();
         }
         else {
@@ -328,7 +328,7 @@ function mine(player, game) {
             if(roll >= threshold) {
                 // Item gain
                 if(roll >= 0.995) {
-                    updateLog(game, "A seemingly magical shard emerges from the ore..", 1);
+                    updateLog(game, "A seemingly magical shard emerges from the ore..", 0);
                     player.shards++;
                 }
                 incrementItems(player, game);
@@ -352,7 +352,7 @@ function mine(player, game) {
             }       
         }    
         else {
-            updateLog(game, "You are not skillful enough to mine this ore!", 1);
+            updateLog(game, "You are not skillful enough to mine this ore!", 0);
         }
     }     
     else {
@@ -515,7 +515,8 @@ function updateLog(game, message, withDate) {
         }
         game.logRow++;
         // Update the game display elements!
-        if(withDate) {
+        console.log(withDate);
+        if(withDate == 1) {
             document.getElementById(current_row).innerHTML = message + " " + h + ":" + m + ":" + s;
         }
         else {
@@ -529,7 +530,12 @@ function updateLog(game, message, withDate) {
         game.row2.innerHTML = game.row3.innerHTML;
         game.row3.innerHTML = game.row4.innerHTML;
         game.row4.innerHTML = game.row5.innerHTML;
-        game.row5.innerHTML = message + " " + h + ":" + m + ":" + s;
+        if(withDate) {
+            game.row5.innerHTML = message + " " + h + ":" + m + ":" + s;
+        }
+        else {
+            game.row5.innerHTML = message;
+        }
         game.row5.style.fontWeight = "bold";
     }
 }
