@@ -179,16 +179,16 @@ class Drops {
 function switchOre(player, game, ore) {
     // When the corresponding picture is clicked, starts to mine that ore! (Only copper so far!)
     if(ore == "copper") {
-        updateLog(game, "You are now mining copper!");
+        updateLog(game, "You are now mining copper!", 0);
         player.currentOre = new Copper();
     }
     if(ore == "iron") {
         if(player.level >= 10) {
-            updateLog(game, "You are now mining iron!");
+            updateLog(game, "You are now mining iron!", 0);
             player.currentOre = new Iron();
         }
         else {
-            updateLog(game, "You are not skilled enough to mine this yet!");
+            updateLog(game, "You are not skilled enough to mine this yet!", 0);
         }
     }
     if(ore == "mithril") {
@@ -197,7 +197,7 @@ function switchOre(player, game, ore) {
             player.currentOre = new Mithril();
         }
         else {
-            updateLog(game, "You are not skilled enough to mine this yet!");
+            updateLog(game, "You are not skilled enough to mine this yet!", 0);
         }
     }
 }
@@ -241,11 +241,11 @@ function craftItem(player, game, item) {
                 swapItem(game, player, item);
             }
             else {
-                updateLog(game, "Crafting failed! Maybe next time...");
+                updateLog(game, "Crafting failed! Maybe next time...", 0);
             }
         }
         else {
-            updateLog(game, "Not enough resources!");
+            updateLog(game, "Not enough resources!", 0);
         }
     }
     if(item.name == "Iron Pickaxe") {
@@ -258,11 +258,11 @@ function craftItem(player, game, item) {
                 swapItem(game, player, item);
             }
             else {
-                updateLog(game, "Crafting failed! Maybe next time...");
+                updateLog(game, "Crafting failed! Maybe next time...", 0);
             }
         }
         else {
-            updateLog(game, "Not enough resources!");
+            updateLog(game, "Not enough resources!", 0);
         }
     }
     if(item.name == "Steel Pickaxe") {
@@ -275,11 +275,11 @@ function craftItem(player, game, item) {
                 swapItem(game, player, item);
             }
             else {
-                updateLog(game, "Crafting failed! Maybe next time...");
+                updateLog(game, "Crafting failed! Maybe next time...", 0);
             }
         }
         else {
-            updateLog(game, "Not enough resources!");
+            updateLog(game, "Not enough resources!", 0);
         }
     }
     if(item.name == "Mithril Pickaxe") {
@@ -292,11 +292,11 @@ function craftItem(player, game, item) {
                 swapItem(game, player, item);
             }
             else {
-                updateLog(game, "Crafting failed! Maybe next time...");
+                updateLog(game, "Crafting failed! Maybe next time...", 0);
             }
         }
         else {
-            updateLog(game, "Not enough resources!");
+            updateLog(game, "Not enough resources!", 0);
         }
     }
     updateDisplay(game, player);
@@ -304,7 +304,7 @@ function craftItem(player, game, item) {
 
 function swapItem(game, player, item) {
     // Set the player's current pickaxe to the one they just crafted and updates display accordingly
-    updateLog(game, "Successfully crafted: " + item.name + " (+" + (item.power - player.pickaxe.power) + " power!)");
+    updateLog(game, "Successfully crafted: " + item.name + " (+" + (item.power - player.pickaxe.power) + " power!)", 0);
     player.pickaxe = item;
     game.pickName.innerHTML =  item.name + " <span id='pickPower'> " + "- Power: " + item.power;
     game.pickName.style.color = item.color;
@@ -328,12 +328,12 @@ function mine(player, game) {
             if(roll >= threshold) {
                 // Item gain
                 if(roll >= 0.995) {
-                    updateLog(game, "A seemingly magical shard emerges from the ore..");
+                    updateLog(game, "A seemingly magical shard emerges from the ore..", 1);
                     player.shards++;
                 }
                 incrementItems(player, game);
                 // Level up stuff
-                updateLog(game, "You mined " + player.currentOre.name + "! (+" + player.currentOre.exp + " exp)");
+                updateLog(game, "You mined " + player.currentOre.name + "! (+" + player.currentOre.exp + " exp)", 1);
                 player.exp+=player.currentOre.exp;
                 game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax;
                 move(player, game); 
@@ -344,19 +344,19 @@ function mine(player, game) {
                     game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax;
                     move(player, game); 
                     checkLevel(player, game);
-                    updateLog(game, "You mined an extra big piece of ore! (+" + player.currentOre.exp + " exp)");
+                    updateLog(game, "You mined an extra big piece of ore! (+" + player.currentOre.exp + " exp)", 0);
                 }
             }
             else {
-                updateLog(game, "Mining...");
+                updateLog(game, "Mining...", 1);
             }       
         }    
         else {
-            updateLog(game, "You are not skillful enough to mine this ore!");
+            updateLog(game, "You are not skillful enough to mine this ore!", 1);
         }
     }     
     else {
-        updateLog(game, "Not mining anything currently...")
+        updateLog(game, "Not mining anything currently...", 1)
     }
 }
 
@@ -364,7 +364,7 @@ function checkLevel(player, game) {
     // Checks every tick to see if the player has leveled!
     if(player.exp >= player.expMax) {
         nextLevel = player.level + 1;
-        updateLog(game, "You have leveled up! (" + player.level + " -> " + nextLevel + ")");
+        updateLog(game, "You have leveled up! (" + player.level + " -> " + nextLevel + ")", 0);
         levelUp(player, game);
         //Update the game display accordingly
         game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax; move(player, game);
@@ -380,7 +380,7 @@ function levelUp(player, game) {
     player.expMax = Math.floor(player.expMax * 1.27);
     if(player.level % 10 == 0) {
         player.tickRate *= 0.9;
-        updateLog(game, "You feel quicker than before! Mining speed up!");
+        updateLog(game, "You feel quicker than before! Mining speed up!", 0);
         console.log(player.tickRate);
         // Clear the game interval and reset with the new tickrate!
         clearInterval(myInterval);
@@ -453,11 +453,11 @@ function readLine(player, game) {
                 num = parseInt(splitLine[2]);
             }
             catch(err) {
-                updateLog(game, "Invalid argument(s) given!");
+                updateLog(game, "Invalid argument(s) given!", 0);
                 return;
             }
             if(num <= 0) {
-                updateLog(game, "Invalid argument(s) given!");
+                updateLog(game, "Invalid argument(s) given!", 0);
             }
             else {
                 exchange(player, game, new Steel(), num);
@@ -480,15 +480,15 @@ function exchange(player, game, target, num) {
             default:
                 alert("Shouldnt get here!");
         }
-        updateLog(game, "You have crafted " + target.name + "! (" + num + ")");
+        updateLog(game, "You have crafted " + target.name + "! (" + num + ")", 0);
         updateDisplay(game, player);
     } 
     else {
-        updateLog("Not enough resources!")
+        updateLog("Not enough resources!", 0)
     }
 }
 
-function updateLog(game, message) {
+function updateLog(game, message, withDate) {
     // Updates the game activity log! -> Keeps track of all player actions
     // Get the current date and format the fields nicely!
     d = new Date()
@@ -515,7 +515,12 @@ function updateLog(game, message) {
         }
         game.logRow++;
         // Update the game display elements!
-        document.getElementById(current_row).innerHTML = message + " " + h + ":" + m + ":" + s;
+        if(withDate) {
+            document.getElementById(current_row).innerHTML = message + " " + h + ":" + m + ":" + s;
+        }
+        else {
+            document.getElementById(current_row).innerHTML = message; 
+        }
         document.getElementById(current_row).style.fontWeight = "bold";
         document.getElementById(prev_row).style.fontWeight = "normal";
     }
