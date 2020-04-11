@@ -634,6 +634,7 @@ function enchant(player) {
         //typeRoll = Math.floor(Math.random() * (2 - 1 + 1)) + 1;
         typeRoll = 1;
         enchantment = new Enchantment(roll, typeRoll);
+        updateLog(game, "Your pick becomes imbued with magical energy...", 0);
         player.shards -= 5;
         //console.log("TESTING: " + roll + " " +  enchantment.tier + " " + enchantment.speedMult);
         if(typeRoll = 1) {
