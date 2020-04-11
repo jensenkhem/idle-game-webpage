@@ -19,7 +19,7 @@ window.onload = function() {
         }
     });
     // Start the game loop!
-    myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate)
+    myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
 };
 
 class Player {
@@ -44,6 +44,10 @@ class Player {
         this.totalIron = 0;
         this.totalSteel = 0;
         this.totalMithril = 0;
+        this.totalShards = 0;
+
+        // Enchantment reset
+        this.enchantment = new Enchantment();
     }
 }
 
@@ -66,13 +70,62 @@ class Game {
         this.pickPower = document.getElementById("pickPower");
         this.shardCount = document.getElementById("magic");
         this.commandLine = document.getElementById("cmdline");
-
+        this.enchantment = document.getElementById("enchantment");
         // Log table data
         this.row1 = document.getElementById("row1");
         this.row2 = document.getElementById("row2");
         this.row3 = document.getElementById("row3");
         this.row4 = document.getElementById("row4");
         this.row5 = document.getElementById("row5");
+    }
+}
+
+class Enchantment {
+    constructor(roll, typeRoll) {
+        this.speedMult = 1;
+        this.powerMult = 1;
+        this.tier = 0;
+        this.color = "#000000";
+        this.text = "None!";
+        if(typeRoll == 1) {
+            // Case speed enchantment
+            if(roll > 0.99) {
+                //Legendary
+                this.speedMult = Math.random() * (0.7 - 0.5) + 0.5;
+                this.tier = 5;
+                this.color = "#FF4500";
+            }
+            else if(roll > 0.9) {
+                //Epic
+                this.speedMult = Math.random() * (0.8 - 0.65) + 0.65;
+                this.tier = 4;
+                this.color = "#9400D3";
+            }
+            else if(roll > 0.75) {
+                //Rare
+                this.speedMult = Math.random() * (0.9 - 0.8) + 0.8;
+                this.tier = 3;
+                this.color = "#1E90FF";
+            }
+            else if(roll > 0.5) {
+                //Uncommon
+                this.speedMult = Math.random() * (0.9 - 0.85) + 0.85;
+                this.tier = 2;
+                this.color = "#6A5ACD";
+            }
+            else {
+                //Common
+                this.speedMult = Math.random() * (0.99 - 0.9) + 0.9;
+                this.tier = 1;
+                this.color = "#696969";
+            }
+            this.speedMult = this.speedMult.toFixed(2);
+            this.text = "Mining speed multiplier: ";
+        }
+        else if(typeRoll == 2) {
+            // Case power enchantment
+            return;
+        }
     }
 }
 
@@ -230,7 +283,8 @@ function incrementItems(player, game) {
 
 function craftItem(player, game, item) {
     // Allow the user to craft pickaxes!
-    console.log(item.name)
+    console.log(item.name);
+    var success = 0;
     if(item.name == "Copper Pickaxe") {
         if(player.copper >= item.cost && item.maxPower >= player.pickaxe.maxPower) {
             // Do not allow the player to accidentely make a big downgrade!
@@ -238,6 +292,7 @@ function craftItem(player, game, item) {
             player.copper -= item.cost;
             if(chance >= 0.50) {
                 // Successfully crafted!
+                success = 1;
                 swapItem(game, player, item);
             }
             else {
@@ -255,6 +310,7 @@ function craftItem(player, game, item) {
             player.iron -= item.cost;
             if(chance >= 0.50) {
                 // Successfully crafted!
+                success = 1;
                 swapItem(game, player, item);
             }
             else {
@@ -272,6 +328,7 @@ function craftItem(player, game, item) {
             player.steel -= item.cost;
             if(chance >= 0.50) {
                 // Successfully crafted!
+                success = 1;
                 swapItem(game, player, item);
             }
             else {
@@ -289,6 +346,7 @@ function craftItem(player, game, item) {
             player.mithril -= item.cost;
             if(chance >= 0.50) {
                 // Successfully crafted!
+                success = 1;
                 swapItem(game, player, item);
             }
             else {
@@ -298,6 +356,13 @@ function craftItem(player, game, item) {
         else {
             updateLog(game, "Not enough resources!", 0);
         }
+    }
+    if(success == 1) {
+        console.log("Before: " + player.enchantment.speedMult);
+        player.enchantment = new Enchantment();
+        clearInterval(myInterval);
+        myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
+        console.log("After: " + player.enchantment.speedMult);
     }
     updateDisplay(game, player);
 }
@@ -330,6 +395,7 @@ function mine(player, game) {
                 if(roll >= 0.995) {
                     updateLog(game, "A seemingly magical shard emerges from the ore..", 0);
                     player.shards++;
+                    player.totalShards++;
                 }
                 incrementItems(player, game);
                 // Level up stuff
@@ -384,12 +450,13 @@ function levelUp(player, game) {
         console.log(player.tickRate);
         // Clear the game interval and reset with the new tickrate!
         clearInterval(myInterval);
-        myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate);
+        myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
     }
 }
 
 function viewStats(player) {
-    alert("Player stats:\nDate started: " + player.creationDate + "\nTotal copper mined: " + player.totalCopper + "\ntotal iron mined: " + player.totalIron + "\ntotal steel crafted: " + player.totalSteel);
+    // Gives the user an alert prompt that has all of their lifetime stats!
+    alert("Player stats:\nDate started: " + player.creationDate + "\nTotal copper mined: " + player.totalCopper + "\ntotal iron mined: " + player.totalIron + "\ntotal steel crafted: " + player.totalSteel + "\ntotal magic shards found: " + player.totalShards);
 }
 
 function move(player, game) {
@@ -410,6 +477,13 @@ function updateDisplay(game, player) {
     game.steelCount.innerHTML = "Steel: " + player.steel;
     game.mithrilCount.innerHTML = "Mithril: " + player.mithril;
     game.shardCount.innerHTML = "Magic shards: " + player.shards;
+    if(player.enchantment.tier != 0 && player.enchantment.speedMult != 1) {
+        game.enchantment.innerHTML = "Enchantment: " + player.enchantment.text + player.enchantment.speedMult;
+        game.enchantment.style.color = player.enchantment.color;
+    }
+    else {
+        game.enchantment.innerHTML = "";
+    }
 }
 
 function readLine(player, game) {
@@ -418,6 +492,9 @@ function readLine(player, game) {
     splitLine = line.split(" ");
     game.commandLine.value = '';
     if(splitLine.length <= 2) {
+        if(line == "enchant") {
+            enchant(player);
+        }
         if(line == "craft cpick") {
             item = new CopperPickaxe();
             craftItem(player, game, item);
@@ -550,6 +627,27 @@ function loadGame() {
     return JSON.parse(localStorage.getItem('player'));
 }
 
+function enchant(player) {
+    // Function for enchanting the user's pick with a cool ability!
+    if(player.shards >= 5) {
+        roll = Math.random();
+        //typeRoll = Math.floor(Math.random() * (2 - 1 + 1)) + 1;
+        typeRoll = 1;
+        enchantment = new Enchantment(roll, typeRoll);
+        player.shards -= 5;
+        //console.log("TESTING: " + roll + " " +  enchantment.tier + " " + enchantment.speedMult);
+        if(typeRoll = 1) {
+            player.enchantment = enchantment;
+            clearInterval(myInterval);
+            myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
+            updateDisplay(game, player);
+        }
+    }
+    else {
+        updateLog(game, "You do not have enough magic shards to make an enchantment!", 0);
+    }
+}
+
 function reset(player) {  
     player.tickRate = 3000;
     player.progress = 0;
@@ -568,5 +666,9 @@ function reset(player) {
     player.totalIron = 0;
     player.totalSteel = 0;
     player.totalMithril = 0;
+    player.shards = 0;
+    player.totalShards = 0;
+    player.enchantment = new Enchantment();
+    game.enchantment.innerHTML = "";
     updateDisplay(game, player);
 }

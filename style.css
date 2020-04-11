@@ -33,6 +33,15 @@
     font-weight: bold;
 }
 
+#enchantment {
+   position: fixed;
+   top: 63%;
+   left: 50%;
+   font-weight: bold;
+   font-size: 20px;
+   transform: translate(-50%, -50%) 
+}
+
 #inventory {
     position: absolute;
     top: 55%;
