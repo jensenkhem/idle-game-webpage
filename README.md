@@ -19,5 +19,5 @@
 # Enchanting:
 #   Enchanting costs 5 magical shards each! -> Enchantment cannot fail, but CAN downgrade
 #   Magical shards are gained randomly at a small chance each successful mine!
-#   As of now, enchantments increase mining speed multiplicatively!
+#   As of now, enchantments increase mining speed or mining power multiplicatively!
 #   NOTE: Enchantments are pickaxe-bound, and therefore disappear upon crafting a new pick!
