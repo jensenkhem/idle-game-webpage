@@ -71,6 +71,7 @@ class Game {
         this.shardCount = document.getElementById("magic");
         this.commandLine = document.getElementById("cmdline");
         this.enchantment = document.getElementById("enchantment");
+        this.displayTick = document.getElementById("tickRate");
         // Log table data
         this.row1 = document.getElementById("row1");
         this.row2 = document.getElementById("row2");
@@ -124,7 +125,38 @@ class Enchantment {
         }
         else if(typeRoll == 2) {
             // Case power enchantment
-            return;
+            if(roll > 0.99) {
+                //Legendary
+                this.powerMult = Math.random() * (2 - 1.5) + 1.5;
+                this.tier = 5;
+                this.color = "#FF4500";
+            }
+            else if(roll > 0.9) {
+                //Epic
+                this.powerMult = Math.random() * (1.6 - 1.3) + 1.3;
+                this.tier = 4;
+                this.color = "#9400D3";
+            }
+            else if(roll > 0.75) {
+                //Rare
+                this.powerMult = Math.random() * (1.5 - 1.2) + 1.2;
+                this.tier = 3;
+                this.color = "#1E90FF";
+            }
+            else if(roll > 0.5) {
+                //Uncommon
+                this.powerMult = Math.random() * (1.3 - 1.15) + 1.15;
+                this.tier = 2;
+                this.color = "#6A5ACD";
+            }
+            else {
+                //Common
+                this.powerMult = Math.random() * (1.2 - 1.05) + 1.05;
+                this.tier = 1;
+                this.color = "#696969";
+            }
+            this.powerMult = this.powerMult.toFixed(2);
+            this.text = "Pickaxe power multiplier: ";
         }
     }
 }
@@ -358,18 +390,17 @@ function craftItem(player, game, item) {
         }
     }
     if(success == 1) {
-        console.log("Before: " + player.enchantment.speedMult);
         player.enchantment = new Enchantment();
+        player.pickaxe.power /= player.enchantment.powerMult;
         clearInterval(myInterval);
         myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
-        console.log("After: " + player.enchantment.speedMult);
     }
     updateDisplay(game, player);
 }
 
 function swapItem(game, player, item) {
     // Set the player's current pickaxe to the one they just crafted and updates display accordingly
-    updateLog(game, "Successfully crafted: " + item.name + " (+" + (item.power - player.pickaxe.power) + " power!)", 0);
+    updateLog(game, "Successfully crafted: " + item.name + " (+" + (item.power - player.pickaxe.power).toFixed(2) + " power!)", 0);
     player.pickaxe = item;
     game.pickName.innerHTML =  item.name + " <span id='pickPower'> " + "- Power: " + item.power;
     game.pickName.style.color = item.color;
@@ -424,6 +455,7 @@ function mine(player, game) {
     else {
         updateLog(game, "Not mining anything currently...", 1)
     }
+    updateDisplay(game, player);
 }
 
 function checkLevel(player, game) {
@@ -470,15 +502,20 @@ function updateDisplay(game, player) {
     // Updates the game's display elements to the correct values stored in memory!
     game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax; move(player, game);
     game.levelDisplay.innerHTML = "Level: " + player.level; 
-    game.pickName.innerHTML = player.pickaxe.name + " <span id='pickPower'> " + "- Power: " + player.pickaxe.power;
+    game.pickName.innerHTML = player.pickaxe.name + " <span id='pickPower'> " + "- Power: " + Math.floor(player.pickaxe.power);
     game.pickName.style.color = player.pickaxe.color;
     game.copperCount.innerHTML = "Copper: " + player.copper;
     game.ironCount.innerHTML = "Iron: " + player.iron;
     game.steelCount.innerHTML = "Steel: " + player.steel;
     game.mithrilCount.innerHTML = "Mithril: " + player.mithril;
     game.shardCount.innerHTML = "Magic shards: " + player.shards;
+    game.displayTick.innerHTML = "Mining speed: " + Math.round(player.tickRate * player.enchantment.speedMult) + "ms";
     if(player.enchantment.tier != 0 && player.enchantment.speedMult != 1) {
         game.enchantment.innerHTML = "Enchantment: " + player.enchantment.text + player.enchantment.speedMult;
+        game.enchantment.style.color = player.enchantment.color;
+    }
+    else if(player.enchantment.tier != 0) {
+        game.enchantment.innerHTML = "Enchantment: " + player.enchantment.text + player.enchantment.powerMult;
         game.enchantment.style.color = player.enchantment.color;
     }
     else {
@@ -631,14 +668,21 @@ function enchant(player) {
     // Function for enchanting the user's pick with a cool ability!
     if(player.shards >= 5) {
         roll = Math.random();
-        //typeRoll = Math.floor(Math.random() * (2 - 1 + 1)) + 1;
-        typeRoll = 1;
+        typeRoll = Math.floor(Math.random() * (2 - 1 + 1)) + 1;
         enchantment = new Enchantment(roll, typeRoll);
         updateLog(game, "Your pick becomes imbued with magical energy...", 0);
         player.shards -= 5;
         //console.log("TESTING: " + roll + " " +  enchantment.tier + " " + enchantment.speedMult);
-        if(typeRoll = 1) {
+        if(typeRoll == 1) {
+            player.pickaxe.power /= player.enchantment.powerMult;
             player.enchantment = enchantment;
+            clearInterval(myInterval);
+            myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
+            updateDisplay(game, player);
+        }
+        else {
+            player.enchantment = enchantment;
+            player.pickaxe.power *= player.enchantment.powerMult;
             clearInterval(myInterval);
             myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
             updateDisplay(game, player);
