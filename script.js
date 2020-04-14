@@ -593,7 +593,7 @@ function readLine(player, game) {
     splitLine = line.split(" ");
     game.commandLine.value = '';
     if(splitLine.length <= 2) {
-        if(line == "e") {
+        if(line == "enchant") {
             enchant(player);
         }
         if(line == "craft cpick") {
