@@ -9,6 +9,9 @@ window.onload = function() {
     game.copperPic.addEventListener("click", function() {switchOre(player, game, "copper")});
     game.ironPic.addEventListener("click", function() {switchOre(player, game, "iron")});
     game.mithrilPic.addEventListener("click", function() {switchOre(player, game, "mithril")});
+    game.adamantPic.addEventListener("click", function() {switchOre(player, game, "adamant")});
+    game.runePic.addEventListener("click", function() {switchOre(player, game, "rune")});
+
     //Update screen elements!
     updateDisplay(game, player);
 
@@ -37,6 +40,8 @@ class Player {
         this.iron = 0;
         this.steel = 0;
         this.mithril = 0;
+        this.adamant = 0;
+        this.rune = 0;
         this.shards = 0;
         // For the lifetime stats page!
         this.creationDate = new Date();
@@ -44,6 +49,8 @@ class Player {
         this.totalIron = 0;
         this.totalSteel = 0;
         this.totalMithril = 0;
+        this.totalAdamant = 0;
+        this.totalRune = 0;
         this.totalShards = 0;
 
         // Enchantment reset
@@ -66,6 +73,10 @@ class Game {
         this.steelCount = document.getElementById("inv3");
         this.mithrilPic = document.getElementById("mithril");
         this.mithrilCount = document.getElementById("inv4");
+        this.adamantPic = document.getElementById("adamant");
+        this.adamantCount = document.getElementById("inv5");
+        this.runePic = document.getElementById("rune");
+        this.runeCount = document.getElementById("inv6");
         this.pickName = document.getElementById("pickName");
         this.pickPower = document.getElementById("pickPower");
         this.shardCount = document.getElementById("magic");
@@ -196,6 +207,22 @@ class Mithril {
     }
 }
 
+class Adamant {
+    constructor() {
+        this.name = "adamant";
+        this.power = 1500;
+        this.exp = 75;
+    }
+}
+
+class Rune {
+    constructor() {
+        this.name = "rune";
+        this.power = 5000;
+        this.exp = 225;
+    }
+}
+
 class WoodPickaxe {
     // Describes the equippable items!
     constructor() {
@@ -285,6 +312,24 @@ function switchOre(player, game, ore) {
             updateLog(game, "You are not skilled enough to mine this yet!", 0);
         }
     }
+    if(ore == "adamant") {
+        if(player.level >= 40) {
+            updateLog(game, "You are now mining adamant!", 0);
+            player.currentOre = new Adamant();
+        }
+        else {
+            updateLog(game, "You are not skilled enough to mine this yet!", 0);
+        }
+    }
+    if(ore == "rune") {
+        if(player.level >= 50) {
+            updateLog(game, "You are now mining rune!", 0);
+            player.currentOre = new Rune();
+        }
+        else {
+            updateLog(game, "You are not skilled enough to mine this yet!", 0);
+        }
+    }
 }
 
 function incrementItems(player, game) {
@@ -309,6 +354,20 @@ function incrementItems(player, game) {
         console.log("Player Mithril: " + player.mithril);
         //Update the game display!
         game.mithrilCount.innerHTML = "Mithril: " + player.mithril;
+    }
+    if(player.currentOre.name == "adamant") {
+        player.adamant++;
+        player.totalAdamant++;
+        console.log("Player Adamant: " + player.adamant);
+        //Update the game display!
+        game.adamantCount.innerHTML = "Adamant: " + player.adamant;
+    }
+    if(player.currentOre.name == "rune") {
+        player.rune++;
+        player.totalRune++;
+        console.log("Player Rune: " + player.rune);
+        //Update the game display!
+        game.adamantCount.innerHTML = "Rune: " + player.rune;
     }
 }
 
@@ -461,8 +520,6 @@ function mine(player, game) {
 function checkLevel(player, game) {
     // Checks every tick to see if the player has leveled!
     if(player.exp >= player.expMax) {
-        nextLevel = player.level + 1;
-        updateLog(game, "You have leveled up! (" + player.level + " -> " + nextLevel + ")", 0);
         levelUp(player, game);
         //Update the game display accordingly
         game.expDisplay.innerHTML = "Exp: " + player.exp + "/" + player.expMax; move(player, game);
@@ -473,16 +530,21 @@ function checkLevel(player, game) {
 
 function levelUp(player, game) {
     // Levels up the player, and upgrades/resets any stats!
-    player.level += 1;
-    player.exp -= player.expMax;
-    player.expMax = Math.floor(player.expMax * 1.27);
-    if(player.level % 10 == 0) {
-        player.tickRate *= 0.9;
-        updateLog(game, "You feel quicker than before! Mining speed up!", 0);
-        console.log(player.tickRate);
-        // Clear the game interval and reset with the new tickrate!
-        clearInterval(myInterval);
-        myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
+    while(player.exp >= player.expMax) {
+        nextLevel = player.level + 1;
+        updateLog(game, "You have leveled up! (" + player.level + " -> " + nextLevel + ")", 0);
+        player.level += 1;
+        player.exp -= player.expMax;
+        player.expMax = Math.floor(player.expMax * 1.27);
+        if(player.level % 10 == 0) {
+            player.tickRate *= 0.9;
+            updateLog(game, "You feel quicker than before! Mining speed up!", 0);
+            console.log(player.tickRate);
+            // Clear the game interval and reset with the new tickrate!
+            clearInterval(myInterval);
+            myInterval = setInterval(function() {mine(player, game); saveGame(player);}, player.tickRate * player.enchantment.speedMult);
+        }
+        updateDisplay(game, player);
     }
 }
 
@@ -508,6 +570,8 @@ function updateDisplay(game, player) {
     game.ironCount.innerHTML = "Iron: " + player.iron;
     game.steelCount.innerHTML = "Steel: " + player.steel;
     game.mithrilCount.innerHTML = "Mithril: " + player.mithril;
+    game.adamantCount.innerHTML = "Adamant: " + player.adamant;
+    game.runeCount.innerHTML = "Rune: " + player.rune;
     game.shardCount.innerHTML = "Magic shards: " + player.shards;
     game.displayTick.innerHTML = "Mining speed: " + Math.round(player.tickRate * player.enchantment.speedMult) + "ms";
     if(player.enchantment.tier != 0 && player.enchantment.speedMult != 1) {
@@ -529,7 +593,7 @@ function readLine(player, game) {
     splitLine = line.split(" ");
     game.commandLine.value = '';
     if(splitLine.length <= 2) {
-        if(line == "enchant") {
+        if(line == "e") {
             enchant(player);
         }
         if(line == "craft cpick") {
@@ -549,10 +613,7 @@ function readLine(player, game) {
             craftItem(player, game, item);
         }
         if(line == "reset") {
-            check = confirm("This will reset the game COMPLETELY -> Are you sure?");
-            if(check == 1) {
-                reset(player);
-            }
+            reset(player)
         }
         if(line == "stats") {
             viewStats(player);
@@ -681,6 +742,7 @@ function enchant(player) {
             updateDisplay(game, player);
         }
         else {
+            player.pickaxe.power /= player.enchantment.powerMult;
             player.enchantment = enchantment;
             player.pickaxe.power *= player.enchantment.powerMult;
             clearInterval(myInterval);
@@ -706,11 +768,15 @@ function reset(player) {
     player.iron = 0;
     player.steel = 0;
     player.mithril = 0;
+    player.adamant = 0;
+    player.rune = 0;
     player.creationDate = new Date();
     player.totalCopper = 0;
     player.totalIron = 0;
     player.totalSteel = 0;
     player.totalMithril = 0;
+    player.totalAdamant = 0;
+    player.totalRune = 0;
     player.shards = 0;
     player.totalShards = 0;
     player.enchantment = new Enchantment();

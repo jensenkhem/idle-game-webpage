@@ -108,6 +108,18 @@
     left: 31%;
     top: 8%;
 }
+
+#adamant {
+    position: fixed;
+    left: 43%;
+    top: 10%;
+}
+
+#rune {
+    position: fixed;
+    left: 55%;
+    top: 10%;
+}
   
 #myBar {
     width: 0%;
