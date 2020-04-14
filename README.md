@@ -11,7 +11,9 @@
 #   cpick: (Copper pickaxe, costs 50 copper to attempt to craft - Power range 6 -> 10)
 #   ipick: (Iron pickaxe, costs 75 iron to attempt to craft - Power range 15 -> 30)
 #   spick: (Steel pickaxe, costs 50 steel to attempt to craft - Power range 50 -> 100)
-#   mpick: (Mithril Pickaxe, costs 50 mithril to attempt to craft - Power range 125 -> 200) 
+#   mpick: (Mithril Pickaxe, costs 250 mithril to attempt to craft - Power range 125 -> 200) 
+#   apick: (Adamant pickaxe, costs 500 adamant to attempt to craft - Power range 300 -> 750)
+#   rpick: (Rune pickaxe, costs 1000 rune to attempt to craft - Power range 1000 -> 2000) 
 # 
 # Items:
 #   steel: Costs 5 iron and 8 copper to make!

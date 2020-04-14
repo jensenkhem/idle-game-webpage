@@ -103,7 +103,7 @@ class Enchantment {
             // Case speed enchantment
             if(roll > 0.99) {
                 //Legendary
-                this.speedMult = Math.random() * (0.7 - 0.5) + 0.5;
+                this.speedMult = Math.random() * (0.65 - 0.5) + 0.5;
                 this.tier = 5;
                 this.color = "#FF4500";
             }
@@ -121,7 +121,7 @@ class Enchantment {
             }
             else if(roll > 0.5) {
                 //Uncommon
-                this.speedMult = Math.random() * (0.9 - 0.85) + 0.85;
+                this.speedMult = Math.random() * (0.95 - 0.85) + 0.85;
                 this.tier = 2;
                 this.color = "#6A5ACD";
             }
@@ -138,19 +138,19 @@ class Enchantment {
             // Case power enchantment
             if(roll > 0.99) {
                 //Legendary
-                this.powerMult = Math.random() * (2 - 1.5) + 1.5;
+                this.powerMult = Math.random() * (2 - 1.7) + 1.7;
                 this.tier = 5;
                 this.color = "#FF4500";
             }
             else if(roll > 0.9) {
                 //Epic
-                this.powerMult = Math.random() * (1.6 - 1.3) + 1.3;
+                this.powerMult = Math.random() * (1.7 - 1.5) + 1.5;
                 this.tier = 4;
                 this.color = "#9400D3";
             }
             else if(roll > 0.75) {
                 //Rare
-                this.powerMult = Math.random() * (1.5 - 1.2) + 1.2;
+                this.powerMult = Math.random() * (1.5 - 1.3) + 1.3;
                 this.tier = 3;
                 this.color = "#1E90FF";
             }
@@ -278,6 +278,29 @@ class MithrilPickaxe {
         this.color = "#9370DB";
     }
 }
+
+class AdamantPickaxe {
+    constructor() {
+        this.name = "Adamant Pickaxe";
+        this.minPower = 300;
+        this.maxPower = 750; 
+        this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
+        this.cost = 500;
+        this.color = "#1C9017";
+    }
+}
+
+class RunePickaxe {
+    constructor() {
+        this.name = "Rune Pickaxe";
+        this.minPower = 1000;
+        this.maxPower = 2000; 
+        this.power = Math.floor(Math.random() * (this.maxPower - this.minPower + 1)) + this.minPower;
+        this.cost = 1000;
+        this.color = "#01BBED";
+    }
+}
+
 
 
 class Drops {
@@ -436,6 +459,43 @@ function craftItem(player, game, item) {
             chance = Math.random();
             player.mithril -= item.cost;
             if(chance >= 0.50) {
+                // Successfully crafted!
+                success = 1;
+                swapItem(game, player, item);
+            }
+            else {
+                updateLog(game, "Crafting failed! Maybe next time...", 0);
+            }
+        }
+        else {
+            updateLog(game, "Not enough resources!", 0);
+        }
+    }
+    if(item.name == "Adamant Pickaxe") {
+        if(player.adamant >= item.cost && item.maxPower >= player.pickaxe.maxPower) {
+            // Do not allow the player to accidentely make a big downgrade!
+            chance = Math.random();
+            player.adamant -= item.cost;
+            if(chance >= 0.30) {
+                // Successfully crafted!
+                success = 1;
+                swapItem(game, player, item);
+            }
+            else {
+                updateLog(game, "Crafting failed! Maybe next time...", 0);
+            }
+        }
+        else {
+            updateLog(game, "Not enough resources!", 0);
+        }
+    }
+    if(item.name == "Rune Pickaxe") {
+        console.log("Got here!");
+        if(player.rune >= item.cost && item.maxPower >= player.pickaxe.maxPower) {
+            // Do not allow the player to accidentely make a big downgrade!
+            chance = Math.random();
+            player.rune -= item.cost;
+            if(chance >= 0.25) {
                 // Successfully crafted!
                 success = 1;
                 swapItem(game, player, item);
@@ -610,6 +670,16 @@ function readLine(player, game) {
         }
         if(line == "craft mpick"){
             item = new MithrilPickaxe();
+            craftItem(player, game, item);
+        }
+        if(line == "craft apick"){
+            item = new AdamantPickaxe();
+            craftItem(player, game, item);
+        }
+        if(line == "craft rpick"){
+            console.log("Got here!")
+            item = new RunePickaxe();
+            console.log(item)
             craftItem(player, game, item);
         }
         if(line == "reset") {
