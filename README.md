@@ -1,5 +1,5 @@
 # idle-miner
-# This is a little idle game I made for fun during quarantine!
+# This is a little idle game I made for fun as a 1st year uni student (Code can be improved on)!
 # Start off mining copper, and work your way up in levels and tools! 
 # 
 # Commands (For input interface):
